@@ -1,0 +1,36 @@
+# Wallet Hunter Lab
+
+```elixir
+Mix.install(
+  [
+    {:hunter, path: Path.join(__DIR__, ".."), env: :dev},
+    {:kino, "~> 0.11.3"}
+  ],
+  config_path: :hunter,
+  lockfile: :hunter
+)
+```
+
+## Mnemonic Words Analysis
+
+```elixir
+Mnemoniac.words()
+|> Enum.uniq_by(fn w -> String.slice(w, 0, 4) end)
+|> length()
+
+# so words distinct by first 4 letters
+```
+
+```elixir
+# Frequency by word size
+Mnemoniac.words()
+|> Enum.frequencies_by(fn w -> String.length(w) end)
+
+# min 3, max 8, mainly in [5,6]
+```
+
+```elixir
+## Frequency by first letter
+Mnemoniac.words()
+|> Enum.frequencies_by(fn w -> String.first(w) end)
+```

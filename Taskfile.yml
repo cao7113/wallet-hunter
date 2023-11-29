@@ -1,0 +1,63 @@
+# https://taskfile.dev
+version: "3"
+vars:
+  API_HOST: "http://localhost:4000"
+  QA_API_HOST: "https://api.dracoo.finance"
+  QA_SSH_HOST: "dracoo.qa"
+  QA_APP_NAME: "metagate"
+  ADM_TOKEN: "adm-dev:2000000000-mock-xxx-token-just-used-in-dev-testing"
+
+tasks:
+  default: mix test # --slowest 5
+  sh: RUN_STAGE=bare iex --erl "-kernel shell_history enabled" -S mix
+  run: iex --erl "-kernel shell_history enabled" -S mix phx.server
+  gan: RUN_STAGE=gan task run
+  bare: RUN_STAGE=bare task run
+  board: open {{.API_HOST}}/dashboard/home
+
+  sql: pgcli hunter_dev
+  db: task sql
+  db-mig:
+    cmds:
+      - mix ecto.migrate
+  db-redo:
+    cmds:
+      - mix ecto.rollback --step 1
+      - mix ecto.migrate --step 1
+  db-reset:
+    cmds:
+      - cd apps/metagate && mix ecto.reset
+  reset-test-db:
+    cmds:
+      - MIX_ENV=test mix ecto.drop
+
+  # Local prod run
+  lp:
+    desc: local prod run
+    dir: local-prod
+    cmds:
+      - ./prun pid
+  # lp-run: cd local-prod && run/prod.sh
+
+  ################################################################
+  #                           QA
+
+  qboard: open {{.QA_API_HOST}}/dashboard/home
+  q:
+    desc: enter qa host
+    cmds:
+      - ssh -t {{.QA_SSH_HOST}} "cd {{.QA_APP_NAME}} && bash --login"
+
+  qsh:
+    desc: enter qa iex sehll
+    cmds:
+      - ssh -t {{.QA_SSH_HOST}} "cd {{.QA_APP_NAME}} && tmux attach -t d"
+
+  qup:
+    desc: deploy qa server
+    cmds:
+      - ssh -t {{.QA_SSH_HOST}} "cd {{.QA_APP_NAME}} && git pull && run/qa.sh"
+  qpush:
+    desc: push code to qa server
+    cmds:
+      - ssh -t {{.QA_SSH_HOST}} "cd {{.QA_APP_NAME}} && git pull"
