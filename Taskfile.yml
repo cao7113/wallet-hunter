@@ -2,9 +2,9 @@
 version: "3"
 vars:
   API_HOST: "http://localhost:4000"
-  QA_API_HOST: "https://api.dracoo.finance"
-  QA_SSH_HOST: "dracoo.qa"
-  QA_APP_NAME: "metagate"
+  QA_API_HOST: "https://api.hunter.finance"
+  QA_SSH_HOST: "hunter.qa"
+  QA_APP_NAME: "hunter"
   ADM_TOKEN: "adm-dev:2000000000-mock-xxx-token-just-used-in-dev-testing"
 
 tasks:
@@ -24,9 +24,6 @@ tasks:
     cmds:
       - mix ecto.rollback --step 1
       - mix ecto.migrate --step 1
-  db-reset:
-    cmds:
-      - cd apps/metagate && mix ecto.reset
   reset-test-db:
     cmds:
       - MIX_ENV=test mix ecto.drop
